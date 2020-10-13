@@ -8,14 +8,34 @@ using System.Threading.Tasks;
 namespace ExampleUIDesignPatterns.CalculatorMVP.Models
 {
     public class CalculatorMVPModel
-    {
-        // _result = (_operandValue1) (_operator (+-x/)) (_operandValue2)
-        // Ex: 6 = 2 * 3
+    {        
+        public double OperandValue1 { get; set; } = 0;
+        public double OperandValue2 { get; set; } = 0;
+        public double Result { get; set; } = 0;  
+        
+        public double Addition()
+        {
+            return Result = OperandValue1 + OperandValue2;
+        }
 
-        public CalculatorHelper.Operators operatorInProgress;
-        public double operandValue1 = 0;
-        public double operandValue2 = 0;
-        public double result = 0;
-        public bool operand1Active = true; // State to hold Current Operand, first? or second?.
+        public double Substraction()
+        {
+            return Result = OperandValue1 - OperandValue2;
+        }
+
+        public double Multiplication()
+        {
+            return Result = OperandValue1 * OperandValue2;
+        }
+
+        public double Division()
+        {
+            return Result = OperandValue1 / OperandValue2;
+        }
+
+        public void Reset()
+        {
+            OperandValue1 = OperandValue2 = Result = 0;
+        }
     }
 }

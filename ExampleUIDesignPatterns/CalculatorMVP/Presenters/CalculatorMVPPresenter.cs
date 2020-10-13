@@ -15,12 +15,17 @@ namespace ExampleUIDesignPatterns.CalculatorMVP.Presenters
         private ICalculatorMVPView _view;
         private CalculatorMVPModel _model;
 
+        private bool operand1Active = true;                         // State to hold Current Operand, first? or second?.
+        private CalculatorHelper.Operators operatorInProgress;
+        // _result = (_operandValue1) (_operator (+-x/)) (_operandValue2)
+        // Ex: 6 = 2 * 3
+
         public CalculatorMVPPresenter(ICalculatorMVPView view, CalculatorMVPModel model) // Note: ICalculatorMVPModel could be created for dependency inversion.
         {
             _view = view;
             _model = model;
 
-            // For readability, presenter has been injected upon creation in higher layer (ex: Program.cs).
+            // For readability, presenter has been injected during creation in the higher layer (ex: Program.cs).
             // _view.Presenter = this;
         }
         
@@ -31,20 +36,20 @@ namespace ExampleUIDesignPatterns.CalculatorMVP.Presenters
             switch (c)
             {
                 case '+':
-                    _model.operatorInProgress = CalculatorHelper.Operators.Addition;
-                    _model.operand1Active = false;
+                    operatorInProgress = CalculatorHelper.Operators.Addition;
+                    operand1Active = false;
                     break;
                 case '-':
-                    _model.operatorInProgress = CalculatorHelper.Operators.Substraction;
-                    _model.operand1Active = false;
+                    operatorInProgress = CalculatorHelper.Operators.Substraction;
+                    operand1Active = false;
                     break;
                 case 'x':
-                    _model.operatorInProgress = CalculatorHelper.Operators.Multiplication;
-                    _model.operand1Active = false;
+                    operatorInProgress = CalculatorHelper.Operators.Multiplication;
+                    operand1Active = false;
                     break;
                 case '/':
-                    _model.operatorInProgress = CalculatorHelper.Operators.Division;
-                    _model.operand1Active = false;
+                    operatorInProgress = CalculatorHelper.Operators.Division;
+                    operand1Active = false;
                     break;
                 case '=':
                     Calculate();
@@ -61,15 +66,15 @@ namespace ExampleUIDesignPatterns.CalculatorMVP.Presenters
 
         private void AppendDigit(int value)
         {
-            if (_model.operand1Active)
+            if (operand1Active)
             {
-                _model.operandValue1 = _model.operandValue1 * 10 + value;
-                _view.screen_Update(_model.operandValue1.ToString());
+                _model.OperandValue1 = _model.OperandValue1 * 10 + value;
+                _view.screen_Update(_model.OperandValue1.ToString());
             }
             else
             {
-                _model.operandValue2 = _model.operandValue2 * 10 + value;
-                _view.screen_Update(_model.operandValue2.ToString());
+                _model.OperandValue2 = _model.OperandValue2 * 10 + value;
+                _view.screen_Update(_model.OperandValue2.ToString());
             }
         }
 
@@ -77,43 +82,43 @@ namespace ExampleUIDesignPatterns.CalculatorMVP.Presenters
         {
             try
             {
-                if (_model.operatorInProgress == CalculatorHelper.Operators.Addition)
+                if (operatorInProgress == CalculatorHelper.Operators.Addition)
                 {
-                    _view.history_Append(_model.operandValue1.ToString() + "+" + _model.operandValue2.ToString());
-                    _model.result = _model.operandValue1 + _model.operandValue2;
+                    _view.history_Append(_model.OperandValue1.ToString() + "+" + _model.OperandValue2.ToString());
+                    _model.Addition();
                 }
-                else if (_model.operatorInProgress == CalculatorHelper.Operators.Substraction)
+                else if (operatorInProgress == CalculatorHelper.Operators.Substraction)
                 {
-                    _view.history_Append(_model.operandValue1.ToString() + "-" + _model.operandValue2.ToString());
-                    _model.result = _model.operandValue1 - _model.operandValue2;
+                    _view.history_Append(_model.OperandValue1.ToString() + "-" + _model.OperandValue2.ToString());
+                    _model.Substraction();
                 }
-                else if (_model.operatorInProgress == CalculatorHelper.Operators.Multiplication)
+                else if (operatorInProgress == CalculatorHelper.Operators.Multiplication)
                 {
-                    _view.history_Append(_model.operandValue1.ToString() + "*" + _model.operandValue2.ToString());
-                    _model.result = _model.operandValue1 * _model.operandValue2;
+                    _view.history_Append(_model.OperandValue1.ToString() + "*" + _model.OperandValue2.ToString());
+                    _model.Multiplication();
                 }
-                else if (_model.operatorInProgress == CalculatorHelper.Operators.Division)
+                else if (operatorInProgress == CalculatorHelper.Operators.Division)
                 {
-                    _view.history_Append(_model.operandValue1.ToString() + "/" + _model.operandValue2.ToString());
-                    _model.result = _model.operandValue1 / _model.operandValue2;
+                    _view.history_Append(_model.OperandValue1.ToString() + "/" + _model.OperandValue2.ToString());
+                    _model.Division();
                 }
             }
             catch
             {
-                _model.result = 0;
+                _model.Reset();
             }
 
             // UI Requirement: If result is below 0, make textbox yellow. otherwise White.
-            if (_model.result < 0)
+            if (_model.Result < 0)
                 _view.screen_SetColor(Color.Yellow);
             else
                 _view.screen_SetColor(Color.White);
 
-            _model.operand1Active = true;
-            _view.screen_Update(_model.result.ToString());
-            _view.history_Append(_model.result.ToString());
-            _model.operandValue1 = 0;
-            _model.operandValue2 = 0;
+            operand1Active = true;
+            _view.screen_Update(_model.Result.ToString());
+            _view.history_Append(_model.Result.ToString());
+
+            _model.Reset();
         }
     }
 }
