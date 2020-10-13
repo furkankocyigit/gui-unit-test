@@ -25,15 +25,14 @@ namespace ExampleUIDesignPatterns.Tests
             viewmock    = new Mock<ICalculatorMVPView>();
             model       = new CalculatorMVPModel();
             presenter   = new CalculatorMVPPresenter(viewmock.Object, model);
-            model.operandValue1 = initial;
-            model.operand1Active = true;
+            model.OperandValue1 = initial;            
             objToTestPrivateMethod = new PrivateObject(presenter);
 
             //Act
             objToTestPrivateMethod.Invoke("AppendDigit", newValue);
 
             //Assert
-            Assert.AreEqual(125, model.operandValue1);
+            Assert.AreEqual(125, model.OperandValue1);
         }
     }
 }
